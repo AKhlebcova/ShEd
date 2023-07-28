@@ -8,6 +8,8 @@
         height: 400px;
         border: 1px solid #ccc;
         }
+
+
     </style>
     <link rel="stylesheet" href="http://openlayers.org/en/v3.20.1/css/ol.css" type="text/css">
     <script src="http://openlayers.org/en/v3.20.1/build/ol.js" type="text/javascript"></script>
@@ -57,16 +59,22 @@
         });
     });
     }
+
+
     </script>
 
 </head>
 <body onload="init()">
 <h1>Edit object shape</h1>
-<b>Please, select object for changing</b> <br/>
+<b>Please, select object for changing or add new object</b> <br/>
 
-<div id="map" class="map"></div><br/>
+<div id="map" class="map"></div>
+<br/>
 <div style="margin-left:20px">
-<button type="button" onClick='window.location="/";'> Cancel </button>
+    <button type="button" onClick='window.location="{{ add_feature_url }}";'> Add object</button>
+    <br/>
+
+    <button onClick='window.location="/";' type="button"> Cancel</button>
 </div>
 </body>
 </html>

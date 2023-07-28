@@ -1,7 +1,8 @@
 from django.contrib.gis.geos.collections import MultiPolygon, MultiLineString, MultiPoint
 from osgeo import ogr
 import pyproj
-from django.contrib.gis import forms
+# from django.contrib.gis import forms
+import floppyforms as forms
 
 def wrap_geos_geometry(geometry):
     if geometry.geom_type == "Polygon":
@@ -155,19 +156,26 @@ def calc_search_radius(latitude, longitude, distance):
 def get_map_form(shapefile):
     geometry_field = calc_geometry_field(shapefile.geom_type)
     if geometry_field == "geom_multipoint":
-        field = forms.MultiPointField
+        field = forms.gis.MultiPointField
+        widget_class = forms.gis.MultiPointWidget
     elif geometry_field == "geom_multilinestring":
-        field = forms.MultiLineStringField
+        field = forms.gis.MultiLineStringField
+        widget_class = forms.gis.MultiLineStringWidget
     elif geometry_field == "geom_multipolygon":
-        field = forms.MultiPolygonField
+        field = forms.gis.MultiPolygonField
+        widget_class = forms.gis.MultiPolygonWidget
     elif geometry_field == "geom_geometrycollection":
-        field = forms.GeometryCollectionField
+        field = forms.gis.GeometryCollectionField
+        widget_class = forms.gis.GeometryCollectionWidget
     else:
         raise RuntimeError(f"Unsupported field: {geometry_field}")
 
-    widget = forms.OpenLayersWidget()
+
+    class MapWidget(forms.gis.BaseOsmWidget, widget_class):
+        pass
+    widget = MapWidget()
 
     class MapForm(forms.Form):
-        geometry = field(widget=widget)
+        geometry = field(widget=MapWidget)
 
     return MapForm

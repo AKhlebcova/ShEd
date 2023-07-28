@@ -1,6 +1,7 @@
 import traceback
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseNotFound
+from django.urls import reverse_lazy
 from shared.models import *
 from django.shortcuts import render
 from django.contrib.gis.geos import Point
@@ -13,9 +14,7 @@ from shared.utils import calc_search_radius, get_map_form, calc_geometry_field
 #     return render(request, "list_shapefiles.html",
 #                   {'shapefiles' : shapefiles})
 
-from django.views.generic import ListView, DetailView
-
-
+from django.views.generic import ListView, DetailView, DeleteView
 
 
 class ShapefilesList(ListView):
@@ -71,7 +70,10 @@ def edit_shapefile(request, id):
         raise HttpResponseNotFound()
 
     tms_url = f'http://{request.get_host()}/tms/'
-    return render(request, "select_feature.html", {'shapefile': shapefile, 'tms_url': tms_url})
+
+    add_feature_url = f'http://{request.get_host()}/edit_feature/{str(id)}/'
+
+    return render(request, "select_feature.html", {'shapefile': shapefile, 'tms_url': tms_url, 'add_feature_url': add_feature_url})
 
 def find_feature(request):
     try:
@@ -102,15 +104,23 @@ def find_feature(request):
         traceback.print_exc()
         return HttpResponse("")
 
-def edit_feature(request, id, pk):
+def edit_feature(request, id, pk=None):
+    if request.method == "POST" and "delete" in request.POST:
+        return HttpResponseRedirect(f"/edit_feature/{id}/{pk}/delete_feature/")
     try:
         shapefile = Shapefile.objects.get(id=id)
     except Shapefile.DoesNotExist:
         return HttpResponseNotFound()
-    try:
-        feature = Feature.objects.get(id=pk)
-    except Feature.DoesNotExist:
-        return HttpResponseNotFound()
+
+    if pk == None:
+        feature = Feature.objects.create(shapefile=shapefile)
+
+    else:
+        try:
+            feature = Feature.objects.get(id=pk)
+        except Feature.DoesNotExist:
+            return HttpResponseNotFound()
+
     attributes = []
     for attr_value in feature.attributevalue_set.all():
         attributes.append([attr_value.attribute.name, attr_value.value])
@@ -130,7 +140,7 @@ def edit_feature(request, id, pk):
                 wkt = form.cleaned_data['geometry']
                 setattr(feature, geometry_field, wkt)
                 feature.save()
-                return HttpResponseRedirect(f"{id}/edit/")
+                return HttpResponseRedirect(f"/{id}/edit/")
         except ValueError:
             pass
         return render(request, "edit_feature.html", {'shapefile': shapefile,
@@ -138,8 +148,28 @@ def edit_feature(request, id, pk):
                                                      'attributes': attributes})
 
 
+    # return HttpResponse("Continous")
+def delete_feature(request, id, pk):
+    try:
+        feature = Feature.objects.get(id=pk)
+    except Feature.DoesNotExist:
+        print('1111')
+        return HttpResponseNotFound()
+    if request.method == "POST":
+        if request.POST['confirm'] == "1":
+            feature.delete()
+            return HttpResponseRedirect(f"/{id}/edit/")
+    return render(request, "delete_feature.html")
+
+
+class ShapefileDelete(DeleteView):
+    model = Shapefile
+    template_name = 'delete_shapefile.html'
+    pk_url_kwarg = 'id'
+    success_url = reverse_lazy('shape_list')
 
 
 
-    return HttpResponse("Continous")
+
+
 # Create your views here.
