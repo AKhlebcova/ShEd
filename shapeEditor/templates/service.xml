@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<TileMapService version="1.0" services="{{ baseURL }}">
+ <Title>Служба TMS приложения ShapeEditor</Title>
+ <Abstract/>
+ <TileMaps>
+     {% for k, v in data.items %}
+        <TileMap title="{{ v }}" srs="EPSG:4326" href="{{ baseURL }}{{ k }}/"/>
+     {% endfor %}
+
+
+ </TileMaps>
+
+</TileMapService>
+

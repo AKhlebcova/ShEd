@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ShapeEditor</title>
+  </head>
+  <body>
+    <h1>ShapeEditor</h1>
+{% if shapefiles %}
+    <b>Available Shapefiles:</b>
+    <table border="0" cellspacing="0" cellpadding="5"
+           style="padding-left:20px">
+  {% for shapefile in shapefiles %}
+        <tr>
+         <h4><a href="{% url 'shape_detail' shapefile.id %}">{{ shapefile.filename }}</a></h4> <br>
+        </tr>
+      <tr>
+  {% endfor %}
+    </table>
+{% endif %}
+    <button type="button"
+            onClick='window.location="/import";'>
+      Import New Shapefile
+    </button>
+  </body>
+</html>

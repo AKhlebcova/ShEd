@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<TileMap version="1.0" tilemapservice="{{ baseURL }}">
+ <Title>{{ shapefile.filename }}</Title>
+ <Abstract/>
+ <SRS>EPSG:4326</SRS>
+    <BoundingBox minx="-180" miny="-90" maxx="180" maxy="90"/>
+    <Origin x="-180" y="-90"/>
+    <TileFormat width="{{ TILE_WIDTH }}" height="{{ TILE_HEIGHT }}" mime-type="image/png" extension="png"/>
+    <TileSets profile="global-geodetic">
+        {% for k, v in data.items %}
+        <TileSet href="{{ v.0 }}" units-per-pixel="{{ v.1 }}" order="{{ k }}" />
+        {% endfor %}
+
+    </TileSets>
+ </TileMap>

@@ -1,0 +1,53 @@
+<!DOCTYPE Map>
+
+<Map srs="+proj=latlong +datum=WGS84" background-color="#0c5b94" minimum-version="0.7.2">
+    <FontSet name="bold-fonts">
+        <Font face-name="DejaVu Sans Book" />
+    </FontSet>
+
+    <Style name="baseLayerStyle">
+        <Rule>
+            <PolygonSymbolizer fill="#c7e9b4"/>
+            <LineSymbolizer stroke="black" stroke-width="0.7"/>
+        </Rule>
+
+    </Style>
+
+    <Style name="featurelayerStyle">
+        <Rule>
+            <!--(Symbolizers)-->
+        </Rule>
+    </Style>
+
+    <Layer name="baseLayer">
+
+        <StyleName>baseLayerStyle</StyleName>
+
+        <Datasource>
+            <Parameter name="type">postgis</Parameter>
+            <Parameter name="dbname">(Database)</Parameter>
+            <Parameter name="table">tms_basemap</Parameter>
+            <Parameter name="user">(DatabaseUser)</Parameter>
+            <Parameter name="password">(UserPassword)</Parameter>
+            <Parameter name="geometry_field">geometry</Parameter>
+            <Parameter name="geometry_table">tms_basemap</Parameter>
+            <Parameter name="srid">4326</Parameter>
+        </Datasource>
+    </Layer>
+        <Layer name="featurelayer">
+
+        <StyleName>featurelayerStyle</StyleName>
+
+        <Datasource>
+            <Parameter name="type">postgis</Parameter>
+            <Parameter name="dbname">(Database)</Parameter>
+            <Parameter name="table">(Query)</Parameter>
+            <Parameter name="user">(DatabaseUser)</Parameter>
+            <Parameter name="password">(UserPassword)</Parameter>
+            <Parameter name="geometry_field">(GeometryField)</Parameter>
+            <Parameter name="geometry_table">shared_feature</Parameter>
+            <Parameter name="srid">4326</Parameter>
+        </Datasource>
+    </Layer>
+
+</Map>

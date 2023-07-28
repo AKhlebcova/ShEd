@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+    <Services>
+        <TileMapService title="Служба TMS приложения ShapeEditor" version="1.0" href="{{ baseURL }}1.0"/>
+    </Services>
