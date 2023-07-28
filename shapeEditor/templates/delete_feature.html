@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ShapeEditor</title>
+</head>
+<body>
+<h1>Delete object</h1>
+
+
+</body>
+</html>
+
+<form method="POST">
+Are you sure, you want to delete the object? <p/>
+    {% csrf_token %}
+<button type="submit" name="confirm" value="1">Agree</button>
+&nbsp;
+<button type="submit" name="confirm" value="0">Cancel</button>
+</form>
+<html>
