@@ -1,34 +1,37 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>ShapeEditor</title>
-  </head>
-  <body>
-    <h1>ShapeEditor</h1>
+{% extends 'flatpages/default_detail.html'%}
+{% block title %}
 {% if file %}
-      <tr>
-        <td>
-          {{ file.filename }}
-        </td>
-        <td>&nbsp;</td>
-        <td>
-          <a href="/{{ file.id }}/edit/">Edit</a>
-        </td>
-        <td>&nbsp;</td>
-        <td>
-          <a href="/{{ file.id }}/export/">Export</a>
-        </td>
-        <td>&nbsp;</td>
-        <td>
-          <a href="/{{ file.id }}/delete/">Delete</a>
-        </td>
-      </tr>
-    {% else %}
-File not found <br>
+{{ file.filename }}
+{% else %}
+File not found
 {% endif %}
-    <button type="button"
-            onClick='window.location="/import";'>
-      Import New Shapefile
-    </button>
-  </body>
-</html>
+{% endblock title %}
+
+{% block content4 %}
+{% if messages %}
+{% for message in messages %}
+    {% if message.tags == "error" %}
+        {{ message }}
+        {% endif %}
+    {% endfor %}
+{% else %}
+You can view and edit, export or delete your shapefile
+{% endif %}
+{% endblock content4 %}
+
+{% block content1 %}
+<a href="/{{ file.id }}/edit/">Edit</a>
+{% endblock content1 %}
+{% block content2 %}
+<a href="/{{ file.id }}/export/">Export</a>
+{% endblock content2 %}
+{% block content3 %}
+<a href="/{{ file.id }}/delete/">Delete</a>
+{% endblock content3 %}
+{% block content5 %}
+<a href="/{{ file.id }}/add/">Add</a>
+{% endblock content5 %}
+
+
+
+

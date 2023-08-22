@@ -1,6 +1,6 @@
 <!DOCTYPE Map>
 
-<Map srs="+proj=latlong +datum=WGS84" background-color="#0c5b94" minimum-version="0.7.2">
+<Map srs="+proj=latlong +datum=WGS84" background-color="#67B0D1" minimum-version="0.7.2">
     <FontSet name="bold-fonts">
         <Font face-name="DejaVu Sans Book" />
     </FontSet>

@@ -131,8 +131,8 @@ def tile(request, version, id, zoom, x, y):
         elif shapefile.geom_type in ["LineString", "MultilineString"]:
             symbolizer = '<LineSymbolizer stroke="#94590c" stroke-width="1" />'
         elif shapefile.geom_type in ["Polygon", "MultiPolygon"]:
-            symbolizer = '''<PolygonSymbolizer fill="#79940c"/>
-            <LineSymbolizer stroke="#94590c" stroke-width="1"/>'''
+            symbolizer = '''<PolygonSymbolizer fill="#677bd1"/>
+            <LineSymbolizer stroke="#263f49" stroke-width="1"/>'''
         map_string = map_string.replace("<!--(Symbolizers)-->", symbolizer)
         map_string = map_string.replace("(Database)", dbname)
         map_string = map_string.replace("(DatabaseUser)", user)

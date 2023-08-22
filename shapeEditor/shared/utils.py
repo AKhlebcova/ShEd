@@ -3,7 +3,9 @@ from osgeo import ogr
 import pyproj
 # from django.contrib.gis import forms
 import floppyforms as forms
+from shared.models import Attribute, AttributeValue
 
+from datetime import datetime
 def wrap_geos_geometry(geometry):
     if geometry.geom_type == "Polygon":
         return MultiPolygon(geometry)
@@ -55,7 +57,7 @@ def get_ogr_feature_attribute(attr, feature):
     elif attr.type == ogr.OFTDate:
         parts = feature.GetFieldAsDateTime(attr_name)
         year, month, day, hour, minute, second, tzone = parts
-        value = "%d,%d,%d,%d" % (year, month, day, tzone)
+        value = "%d,%d,%d" % (year, month, day)
     elif attr.type == ogr.OFTTime:
         parts = feature.GetFieldAsDateTime(attr_name)
         year, month, day, hour, minute, second, tzone = parts
@@ -73,12 +75,16 @@ def get_ogr_feature_attribute(attr, feature):
 
 
 def unwrap_geos_geometry(geometry):
-    if geometry.geom_type in ["MultiPolygon",
-                              "MultiLineString",
-                              "MultiPoint"]:
-        if len(geometry) == 1:
-            geometry = geometry[0]
-    return geometry
+    try:
+        geometry.geom_type
+        if geometry.geom_type in ["MultiPolygon",
+                                  "MultiLineString",
+                                  "MultiPoint"]:
+            if len(geometry) == 1:
+                geometry = geometry[0]
+        return geometry
+    except AttributeError:
+        pass
 
 
 
@@ -116,9 +122,9 @@ def set_ogr_feature_attribute(attr, value, feature):
         year = int(parts[0])
         month = int(parts[1])
         day = int(parts[2])
-        tzone = int(parts[3])
+        # tzone = int(parts[3])
         feature.SetField(attr_name, year, month, day,
-                         0, 0, 0, tzone)
+                         0, 0, 0, 0)
     elif attr.type == ogr.OFTTime:
         parts = value.split(",")
         hour = int(parts[0])
@@ -152,6 +158,71 @@ def calc_search_radius(latitude, longitude, distance):
     radius = max(radius, longitude - x)
     return radius
 
+def get_attr_form(shapefile, feature):
+    attributes = Attribute.objects.filter(shapefile=shapefile)
+    # fields = {}
+    # for attr in attributes:
+    #     fields[attr.name] = (attr.type, attr.width, attr.precision
+    #     fields.append(attr.name)
+
+    class ShapefileAtributeForm(forms.Form):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            for attr in attributes:
+                field_name = '%s' % (attr.name,)
+                if attr.type == ogr.OFTInteger or attr.type == ogr.OFTInteger64:
+                    self.fields[field_name] = forms.IntegerField(max_value=10**attr.width - 1, required=False)
+                elif attr.type == ogr.OFTReal:
+                    self.fields[field_name] = forms.DecimalField(decimal_places=attr.precision, required=False)
+                elif attr.type == ogr.OFTDate:
+                    self.fields[field_name] = forms.DateField(required=False, help_text='Input date')
+                # elif attr.type == ogr.OFTTime:
+                #     self.fields[field_name] = forms.TimeField(required=False, help_text='Input time')
+                # elif attr.type == ogr.OFTDateTime:
+                #     self.fields[field_name] = forms.TimeField(required=False, help_text='Input date and time')
+                # elif attr.type == ogr.OFTString:
+                #     self.fields[field_name] = forms.CharField(max_length=attr.width, required=False)
+                # elif attr.type == ogr.OFTIntegerList or attr.type == ogr.OFTRealList or attr.type == ogr.OFTStringList:
+                #     self.fields[field_name] = forms.CharField(max_length=attr.width, required=False, widget=forms.Textarea)
+                else:
+                    self.fields[field_name] = forms.CharField(max_length=attr.width, required=False)
+
+
+        def save(self):
+            for attr in self.changed_data:
+                attr_obj = Attribute.objects.get(name=attr, shapefile=shapefile)
+
+                try:
+                    if self.cleaned_data.get(attr) == None:
+                        value = None
+                    elif attr_obj.type == ogr.OFTInteger or attr_obj.type == ogr.OFTInteger64:
+                        int(self.cleaned_data.get(attr))
+                        value = str(self.cleaned_data.get(attr))
+                    elif attr_obj.type == ogr.OFTReal:
+                        float(self.cleaned_data.get(attr))
+                        value = str(round(self.cleaned_data.get(attr), attr_obj.precision))
+                    elif attr_obj.type == ogr.OFTDate:
+                        value = (self.cleaned_data.get(attr)).strftime('%Y,%m,%d')
+                    else:
+                        value = self.cleaned_data.get(attr)
+
+                    attr_val, created = AttributeValue.objects.get_or_create(attribute=attr_obj, feature=feature)
+                    attr_val.value = value
+                    attr_val.save()
+                except TypeError:
+                    return (False, f"Error of attribute type: {str(attr_obj.type)} {attr_obj.name}")
+                except ValueError:
+                    return (False, f"Error of attribute value: {str(attr_obj.type)} {attr_obj.name}")
+
+            return (True, "Success changes")
+
+
+    return ShapefileAtributeForm
+
+
+
+
+
 
 def get_map_form(shapefile):
     geometry_field = calc_geometry_field(shapefile.geom_type)
@@ -172,10 +243,14 @@ def get_map_form(shapefile):
 
 
     class MapWidget(forms.gis.BaseOsmWidget, widget_class):
+        map_width = 1000
+        map_height = 700
         pass
     widget = MapWidget()
 
     class MapForm(forms.Form):
-        geometry = field(widget=MapWidget)
+        geometry = field(widget=MapWidget, required=True)
 
     return MapForm
+
+

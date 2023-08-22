@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shapefiles.urls')),
     path('tms/', include('tms.urls')),
+    path('accounts/', include('allauth.urls')),
 ]

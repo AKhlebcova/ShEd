@@ -1,25 +1,58 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ShapeEditor</title>
-</head>
-<body>
-<h1>ShapeEditor</h1>
+{% extends 'flatpages/default.html'%}
+{% block title %}
+Available Shapefiles:
+{% endblock title %}
+{% block content3 %}
+<form action="{% url 'search_results' %}" method="get">
+  <input name="q" type="text" placeholder="Search...">
+    <input type="submit" value="Search">
+</form>
+{% endblock content3 %}
+
+
+{% block content %}
 {% if shapefiles %}
-<b>Available Shapefiles:</b>
-<table border="0" cellspacing="0" cellpadding="5"
-       style="padding-left:20px">
+
     {% for shapefile in shapefiles %}
+<table>
     <tr>
         <h4><a href="{% url 'shape_detail' shapefile.id %}">{{ shapefile.filename }}</a></h4> <br>
     </tr>
-    <tr>
         {% endfor %}
 </table>
 {% endif %}
-<button type="button"
+{% endblock content %}
+{% block content1 %}
+<p><button type="button"
         onClick='window.location="/import";'>
     Import New Shapefile
-</button>
-</body>
-</html>
+</button></p>
+
+<p></p><button type="button"
+        onClick='window.location="/create/";'>
+    Create New Shapefile
+</button></p>
+{% endblock content1 %}
+{% block content2 %}
+<br>
+<br>
+           {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+{% endblock content2 %}

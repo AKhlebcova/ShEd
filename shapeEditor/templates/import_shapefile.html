@@ -1,22 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ShapeEditor</title>
-</head>
-<body>
-<h1>Import Shapefile</h1>
+{% extends 'flatpages/default.html'%}
+{% block title %}
+Import Shapefile
+{% endblock title %}
+{% block content1 %}
 {% if errMsg %}
-<b><i>{{ errMsg }}</i></b>
+{{ errMsg }}
 {% endif %}
+<br>
+<br>
 <form enctype="multipart/form-data" method="post"
       action="">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Submit"/>
+
     <button type="button"
             onClick='window.location=" ";'>
         Cancel
     </button>
 </form>
-</body>
-</html>
+
+{% endblock content1 %}

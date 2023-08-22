@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ShapeEditor</title>
-    <style type="text/css">
-    div#map {
-        width: 600px;
-        height: 400px;
-        border: 1px solid #ccc;
-        }
+{% extends 'flatpages/default_select_feature.html'%}
+{% block content2 %}
 
 
-    </style>
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.20.1/css/ol.css" type="text/css">
+<link rel="stylesheet" href="http://openlayers.org/en/v3.20.1/css/ol.css" type="text/css">
     <script src="http://openlayers.org/en/v3.20.1/build/ol.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -47,7 +38,7 @@
                           view: view});
     map.on ("singleclick", function(e) {
         var request = jQuery.ajax({
-            url : "/find_feature",
+            url : "/find_feature/",
             data : {id : {{ shapefile.id }},
             latitude : e.coordinate[1],
             longitude : e.coordinate[0]},
@@ -62,19 +53,34 @@
 
 
     </script>
+{% endblock content2 %}
+{% block title %}
+Edit object shape
+{% endblock title %}
+{% block content %}
+{% if user == shapefile.author %}
+Please, select object for changing or add new object
+{% else %}
+You can't edit shapefile {{ shapefile.filename }} because you are not the owner, try to add it in your profile.
+{% endif %}
+{% endblock content %}
+{% block content1 %}
+<br>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 
-</head>
-<body onload="init()">
-<h1>Edit object shape</h1>
-<b>Please, select object for changing or add new object</b> <br/>
+{% if user == shapefile.author %}
+<br>
+<button type="button" onClick='window.location="{{ add_feature_url }}";'> Add object</button>
+<br>
+{% endif %}
+<br>
+<button onClick='window.location="/{{ shapefile.id }}/";' type="button"> Cancel</button>
+<br>
 
-<div id="map" class="map"></div>
-<br/>
-<div style="margin-left:20px">
-    <button type="button" onClick='window.location="{{ add_feature_url }}";'> Add object</button>
-    <br/>
-
-    <button onClick='window.location="/";' type="button"> Cancel</button>
-</div>
-</body>
-</html>
+{% endblock content1 %}

@@ -1,13 +1,22 @@
 from django.contrib.gis.db import models
+from django.urls import reverse
+from django.contrib.auth.models import User
+
+
 
 
 class Shapefile(models.Model):
     filename = models.CharField(max_length=255)
-    srs_wkt = models.CharField(max_length=500)
+    srs_wkt = models.CharField(max_length=2048)
     geom_type = models.CharField(max_length=50)
+    author = models.ForeignKey(User, on_delete=models.SET_DEFAULT, blank=True, default=1)
+
 
     def __str__(self):
         return self.filename
+
+    def get_absolute_url(self):
+        return reverse("shape_detail", kwargs={"id": self.id})
 
 
 class Attribute(models.Model):
@@ -16,6 +25,13 @@ class Attribute(models.Model):
     type = models.IntegerField()
     width = models.IntegerField()
     precision = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["shapefile", "name"], name='name of constraint'),
+        ]
+
+
 
     def __str__(self):
         return self.name

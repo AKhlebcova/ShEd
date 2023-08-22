@@ -1,20 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>ShapeEditor</title>
-</head>
-<body>
-<h1>Delete shapefile</h1>
-
-
-</body>
-</html>
-
+{% extends 'flatpages/default.html'%}
+{% block title %}
+Delete shapefile
+{% endblock title %}
+{% block content1 %}
+{% if user == shapefile.author %}
 <form method="POST">
-Are you sure, you want to delete the shapefile {{shapefile.filename}}? <p/>
+<p>Are you sure, you want to delete the shapefile {{shapefile.filename}}?</p>
     {% csrf_token %}
+    <br>
 <button type="submit">Agree</button>
 </form>
-<html>
+{% else %}
+<p>You can't to delete shapefile {{shapefile.filename}}, because you are not the owner.</p>
+{% endif %}
+{% endblock content1 %}
+
 

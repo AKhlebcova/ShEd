@@ -1,3 +1,27 @@
+{% extends 'flatpages/default.html'%}
+{% block title %}
+Delete object
+{% endblock title %}
+{% block content1 %}
+<form method="POST">
+Are you sure, you want to delete the object? <p/>
+    {% csrf_token %}
+<button type="submit" name="confirm" value="1">Agree</button>
+&nbsp;
+<button type="submit" name="confirm" value="0">Cancel</button>
+</form>
+{% endblock content1 %}
+
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
